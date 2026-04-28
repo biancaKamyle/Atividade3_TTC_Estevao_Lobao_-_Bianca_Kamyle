@@ -1,0 +1,47 @@
+#include <SPI.h>
+#include <LoRa.h>
+
+#define ss 5 
+#define rst 14
+#define dio0 2
+
+void setup() {
+  Serial.begin(115200);
+  while (!Serial);
+
+  Serial.println("LoRa Receptor - Iniciando...");
+
+  LoRa.setPins(ss, rst, dio0);
+
+ 
+  if (!LoRa.begin(433E6)) {
+    Serial.println("Falha ao iniciar o LoRa.");
+    while (1);
+  }
+
+ 
+  LoRa.setSpreadingFactor(7); 
+  LoRa.setSignalBandwidth(125E3); 
+
+  Serial.println("Aguardando pacotes...");
+}
+
+void loop() {
+ 
+  int packetSize = LoRa.parsePacket();
+  
+  if (packetSize) {
+    
+    Serial.print("Recebido: '");
+
+   
+    while (LoRa.available()) {
+      String data = LoRa.readString();
+      Serial.print(data);
+    }
+
+  
+    Serial.print("' com RSSI ");
+    Serial.println(LoRa.packetRssi());
+  }
+}

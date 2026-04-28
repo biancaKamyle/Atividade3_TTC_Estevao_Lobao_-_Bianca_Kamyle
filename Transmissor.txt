@@ -1,0 +1,41 @@
+#include <SPI.h>
+#include <LoRa.h>
+
+#define ss 5 
+#define rst 14
+#define dio0 2
+
+int contadorMensagem = 1;
+
+void setup() {
+  Serial.begin(115200);
+  while (!Serial);
+
+  Serial.println("LoRa Transmissor - Iniciando...");
+
+  LoRa.setPins(ss, rst, dio0);
+
+  if (!LoRa.begin(433E6)) {
+    Serial.println("Falha ao iniciar o LoRa. Verifique as conexões.");
+    while (1);
+  }
+
+  LoRa.setTxPower(10); 
+  LoRa.setSpreadingFactor(7); 
+  LoRa.setSignalBandwidth(125E3); 
+  
+  Serial.println("Transmissor pronto!");
+}
+
+void loop() {
+  Serial.print("Enviando pacote: #");
+  Serial.println(contadorMensagem);
+
+  LoRa.beginPacket();
+  LoRa.print("Mensagem #");
+  LoRa.print(contadorMensagem);
+  LoRa.endPacket();
+
+  contadorMensagem++;
+  delay(3000); 
+}
